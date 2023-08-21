@@ -423,3 +423,276 @@ def make_table(result_dict):
     # print(latex_writer.dumps())
 
     return md_writer.dumps()
+
+
+
+def make_csv(is_new, result_dict, model_info):
+    """Generate csv of results."""
+    import pandas as pd
+    import os
+    
+    if not os.path.exists("output"):
+        os.makedirs("output")
+        
+    if not os.path.exists(f"output/{model_info}.csv"):
+        df = pd.DataFrame()
+        is_new = True
+    else:
+        df = pd.read_csv(f"output/{model_info}.csv")
+    
+    math_idx = []
+    hendrycksTest_idx = []
+    ceval_idx = []
+    cmmlu_idx = []
+    
+    if is_new:
+        row_idx = len(df)
+    else:
+        row_idx = len(df)-1
+    
+    num_fewshot = result_dict['config']['num_fewshot']
+    
+    for task_name, metric_dic in result_dict['results'].items():
+        
+        if task_name.startswith('math'):
+            math_idx.append(task_name)
+        
+        elif task_name.startswith('hendrycksTest'):
+            hendrycksTest_idx.append(task_name)
+        
+        elif task_name.startswith('ceval'):
+            ceval_idx.append(task_name)
+        
+        elif task_name.startswith('cmmlu'):
+            cmmlu_idx.append(task_name)
+        
+        for metric_name, metric_value in metric_dic.items():
+            
+            if metric_name.endswith('_stderr') or metric_name == 'num_samples':
+                    continue
+            
+            df.loc[row_idx, task_name+'_'+ str(num_fewshot) + "shot" + '_' + metric_name] = f"{round(metric_value * 100, 2)}"
+                
+    
+    '''if len(math_idx) > 0:
+        avgacc = 0
+        total_len = 0
+        for task_name in math_idx:
+            num_samples = result_dict['results'][task_name]['num_samples']
+            avgacc += result_dict['results'][task_name].get(metric_type, 0) * num_samples
+            total_len += num_samples
+            
+        avgacc /= total_len
+        df.loc[len(df)-1, 'math'] = f"{round(avgacc*100,2)}"'''
+        
+    if len(hendrycksTest_idx) > 0:
+        for metric_name, metric_value in result_dict['results'][hendrycksTest_idx[0]].items():
+            avg = 0
+            if metric_name.endswith('_stderr') or metric_name == 'num_samples':
+                    continue
+            for task_name in hendrycksTest_idx:
+                avg += result_dict['results'][task_name].get(metric_name, 0)
+            avg /= len(hendrycksTest_idx)
+            df.loc[row_idx, 'hendrycksTest_fullavg_' + str(num_fewshot) + "shot" + '_' + metric_name] = f"{round(avg * 100, 2)}"
+        
+    
+    if len(ceval_idx) > 0:
+        for metric_name, metric_value in result_dict['results'][ceval_idx[0]].items():
+            avg = 0
+            if metric_name.endswith('_stderr') or metric_name == 'num_samples':
+                    continue
+            for task_name in ceval_idx:
+                avg += result_dict['results'][task_name].get(metric_name, 0)
+            avg /= len(ceval_idx)
+            df.loc[row_idx, 'ceval_fullavg_' + str(num_fewshot) + "shot" + '_' + metric_name] = f"{round(avg * 100, 2)}"
+            
+    
+    if len(cmmlu_idx) > 0:
+        for metric_name, metric_value in result_dict['results'][cmmlu_idx[0]].items():
+            avg = 0
+            if metric_name.endswith('_stderr') or metric_name == 'num_samples':
+                    continue
+            for task_name in cmmlu_idx:
+                avg += result_dict['results'][task_name].get(metric_name, 0)
+            avg /= len(cmmlu_idx)
+            df.loc[row_idx, 'cmmlu_fullavg_' + str(num_fewshot) + "shot" + '_' + metric_name] = f"{round(avg * 100, 2)}"
+            
+    df.to_csv(f"output/{model_info}.csv", index=False)
+
+
+
+def save_to_database(result_dict, model_info):
+    import os
+    import mysql.connector
+    import json
+
+    # 读取 JSON 参数文件
+    with open('./lm_eval/database_config.json') as config_file:
+        config = json.load(config_file)
+
+    # 获取数据库连接的关键信息
+    host = config['host']
+    user = config['user']
+    password = config['password']
+    database = config['database']
+    
+    cnx = mysql.connector.connect(
+    host=host,
+    user=user,
+    password=password,
+    database=database,
+    )
+
+    cursor = cnx.cursor()
+    
+    math_idx = []
+    hendrycksTest_idx = []
+    ceval_idx = []
+    cmmlu_idx = []
+    
+    num_fewshot = result_dict['config']['num_fewshot']
+    
+    for task_name, metric_dic in result_dict['results'].items():
+        
+        if task_name.startswith('math'):
+            math_idx.append(task_name)
+        
+        elif task_name.startswith('hendrycksTest'):
+            hendrycksTest_idx.append(task_name)
+        
+        elif task_name.startswith('ceval'):
+            ceval_idx.append(task_name)
+        
+        elif task_name.startswith('cmmlu'):
+            cmmlu_idx.append(task_name)
+        
+        for metric_name, metric_value in metric_dic.items():
+            if metric_name.endswith('_stderr') or metric_name == 'num_samples':
+                continue
+            insert_new_record('lm_harness_evaluation', {'model_name': model_info, "dataset_name": task_name+'_'+ str(num_fewshot) + "shot", "metric_name": metric_name, "metric_value": round(metric_value * 10000, 4)}, cursor)
+                
+    
+    '''if len(math_idx) > 0:
+        avgacc = 0
+        total_len = 0
+        for task_name in math_idx:
+            num_samples = result_dict['results'][task_name]['num_samples']
+            avgacc += result_dict['results'][task_name].get(metric_type, 0) * num_samples
+            total_len += num_samples
+            
+        avgacc /= total_len
+        df.loc[len(df)-1, 'math'] = f"{round(avgacc*100,2)}"'''
+        
+    if len(hendrycksTest_idx) > 0:
+        for metric_name, metric_value in result_dict['results'][hendrycksTest_idx[0]].items():
+            avg = 0
+            if metric_name.endswith('_stderr') or metric_name == 'num_samples':
+                    continue
+            for task_name in hendrycksTest_idx:
+                avg += result_dict['results'][task_name].get(metric_name, 0)
+            avg /= len(hendrycksTest_idx)
+            insert_new_record('lm_harness_evaluation', {'model_name': model_info, "dataset_name": 'hendrycksTest_fullavg_' + str(num_fewshot) + "shot", "metric_name": metric_name, "metric_value": round(avg * 10000, 4)}, cursor)
+        
+    
+    if len(ceval_idx) > 0:
+        for metric_name, metric_value in result_dict['results'][ceval_idx[0]].items():
+            avg = 0
+            if metric_name.endswith('_stderr') or metric_name == 'num_samples':
+                    continue
+            for task_name in ceval_idx:
+                avg += result_dict['results'][task_name].get(metric_name, 0)
+            avg /= len(ceval_idx)
+            insert_new_record('lm_harness_evaluation', {'model_name': model_info, "dataset_name": 'ceval_fullavg_' + str(num_fewshot) + "shot", "metric_name": metric_name, "metric_value": round(avg * 10000, 4)}, cursor)
+            
+    
+    if len(cmmlu_idx) > 0:
+        for metric_name, metric_value in result_dict['results'][cmmlu_idx[0]].items():
+            avg = 0
+            if metric_name.endswith('_stderr') or metric_name == 'num_samples':
+                    continue
+            for task_name in cmmlu_idx:
+                avg += result_dict['results'][task_name].get(metric_name, 0)
+            avg /= len(cmmlu_idx)
+            insert_new_record('lm_harness_evaluation', {'model_name': model_info, "dataset_name": 'cmmlu_fivetasksavg_' + str(num_fewshot) + "shot", "metric_name": metric_name, "metric_value": round(avg * 10000, 4)}, cursor)
+        
+            
+    cnx.commit()
+    
+    cursor.close()
+    cnx.close()
+
+
+
+def detect_and_add_column(table_name, record, cursor):
+    
+    # 插入前的准备，检查表中是否有这个字段，没有的话就添加
+    cursor.execute(f'SHOW COLUMNS FROM {table_name}')
+    columns = [column[0] for column in cursor.fetchall()]
+
+    # 检查插入记录中的字段是否存在于表中
+    for field in record.keys():
+        if field not in columns:
+            # 如果字段不存在，根据字段名和类型添加新列
+            alter_table_query = f'''
+            ALTER TABLE {table_name}
+            ADD COLUMN {field} INT
+            '''
+            cursor.execute(alter_table_query)
+            
+            # 更新列信息
+            columns.append(field)
+    
+
+def insert_new_record(table_name, record, cursor):
+    
+    detect_and_add_column(table_name, record, cursor)
+    
+    insert_query = f'''
+    INSERT INTO {table_name} ({", ".join(record.keys())})
+    VALUES ({", ".join(["%s"] * len(record))})
+    '''
+    cursor.execute(insert_query, tuple(record.values()))
+    
+
+
+def update_old_record(table_name, record, cursor):
+    
+    detect_and_add_column(table_name, record, cursor)
+    
+    # 获取当前时间
+    from datetime import datetime
+    current_time = datetime.now()
+
+    # 构建 SQL 查询语句
+    select_query = f'''
+    SELECT *
+    FROM {table_name}
+    WHERE model_name = '{record["model_name"]}'
+    ORDER BY ABS(TIMESTAMPDIFF(SECOND, inserted_time, '{current_time}'))
+    LIMIT 1
+    '''
+
+    # 执行查询
+    cursor.execute(select_query)
+    result = cursor.fetchone()
+
+    if result:
+        # 更新记录的其他字段
+        
+        update_query = f'''
+        UPDATE {table_name}
+        SET {', '.join([f'{key} = %s' for key in record.keys()])}
+        WHERE id = %s
+        '''
+
+        # 提取字段值列表
+        values = list(record.values())
+        values.append(result[0])
+
+        # 执行更新操作
+        cursor.execute(update_query, values)
+        
+    else:
+        print("Warning: no record found, insert new record instead.")
+
+        

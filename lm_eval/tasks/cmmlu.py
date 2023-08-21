@@ -13,69 +13,68 @@ from lm_eval.base import MultipleChoiceTask
 
 
 # TODO: Add the BibTeX citation for the task.
-_CITATION = """@article{huang2023ceval,
-title={C-Eval: A Multi-Level Multi-Discipline Chinese Evaluation Suite for Foundation Models}, 
-author={Huang, Yuzhen and Bai, Yuzhuo and Zhu, Zhihao and Zhang, Junlei and Zhang, Jinghan and Su, Tangjun and Liu, Junteng and Lv, Chuancheng and Zhang, Yikai and Lei, Jiayi and Fu, Yao and Sun, Maosong and He, Junxian},
-journal={arXiv preprint arXiv:2305.08322},
-year={2023}
-}
-"""
+_CITATION = ''''''
 
 
 
 SUBJECTS = [
-    'tax_accountant', 
-    'fire_engineer', 
-    'high_school_politics', 
-    'middle_school_chemistry', 
-    'plant_protection', 
-    'computer_architecture', 
-    'art_studies', 
-    'legal_professional', 
-    'clinical_medicine', 
-    'ideological_and_moral_cultivation', 
+    'conceptual_physics', 
+    'high_school_microeconomics', 
+    'high_school_european_history', 
+    'college_biology', 
+    'abstract_algebra', 
+    'electrical_engineering', 
+    'clinical_knowledge', 
+    'philosophy', 
+    'high_school_macroeconomics', 
+    'professional_psychology', 
+    'professional_accounting', 
     'high_school_geography', 
-    'teacher_qualification', 
-    'probability_and_statistics', 
-    'high_school_chinese', 
-    'sports_science', 
-    'high_school_history', 
-    'middle_school_geography', 
-    'operating_system', 
-    'college_programming', 
-    'discrete_mathematics', 
-    'urban_and_rural_planner', 
-    'electrical_engineer', 
-    'computer_network', 
+    'international_law', 
+    'management', 
+    'anatomy', 
     'college_physics', 
-    'marxism', 
-    'college_economics', 
-    'law', 
-    'education_science', 
-    'middle_school_biology', 
-    'civil_servant', 
-    'business_administration', 
-    'basic_medicine', 
-    'metrology_engineer', 
-    'advanced_mathematics', 
-    'veterinary_medicine', 
+    'virology', 
+    'high_school_statistics', 
+    'global_facts', 
+    'miscellaneous', 
+    'human_aging', 
+    'moral_disputes', 
+    'logical_fallacies', 
+    'college_mathematics', 
+    'high_school_world_history', 
+    'nutrition', 
+    'us_foreign_policy', 
+    'computer_security', 
     'high_school_physics', 
-    'middle_school_politics', 
-    'accountant', 
+    'high_school_psychology', 
+    'high_school_us_history', 
+    'formal_logic', 
+    'medical_genetics', 
+    'security_studies', 
+    'marketing', 
     'college_chemistry', 
-    'physician', 
-    'modern_chinese_history', 
+    'high_school_computer_science', 
+    'machine_learning', 
     'high_school_biology', 
-    'middle_school_physics', 
-    'mao_zedong_thought', 
+    'professional_medicine', 
+    'human_sexuality', 
+    'public_relations', 
+    'jurisprudence', 
+    'college_medicine', 
     'high_school_mathematics', 
+    'moral_scenarios', 
     'high_school_chemistry', 
-    'environmental_impact_assessment_engineer', 
-    'middle_school_mathematics', 
-    'professional_tour_guide', 
-    'middle_school_history', 
-    'chinese_language_and_literature', 
-    'logic'
+    'elementary_mathematics', 
+    'astronomy', 
+    'business_ethics', 
+    'prehistory', 
+    'professional_law', 
+    'college_computer_science', 
+    'world_religions', 
+    'sociology', 
+    'high_school_government_and_politics', 
+    'econometrics'
 ]
 
 
@@ -84,25 +83,25 @@ def create_all_tasks():
     :return: {task_name: task}
         e.g. {hendrycksTest-abstract_algebra: Task, hendrycksTest-anatomy: Task}
     """
-    return {f"ceval-{sub}": create_task(sub) for sub in SUBJECTS}
+    return {f"cmmlu-{sub}": create_task(sub) for sub in SUBJECTS}
 
 
 def create_task(subject):
-    class Ceval(GeneralCevalTask):
+    class Cmmlu(GeneralCmmluTask):
         def __init__(self):
             super().__init__(subject)
 
-    return Ceval
+    return Cmmlu
 
 
 
-class GeneralCevalTask(MultipleChoiceTask):
+class GeneralCmmluTask(MultipleChoiceTask):
     VERSION = 0
     DATASET_PATH = 'csv'
     DATASET_NAME = None
 
     def __init__(self, subject):
-        data_dir = f'custom_dataset/ceval/{subject}'
+        data_dir = f'custom_dataset/cmmlu/{subject}'
         super().__init__(data_dir=data_dir)
 
     def has_training_docs(self):
@@ -112,7 +111,7 @@ class GeneralCevalTask(MultipleChoiceTask):
         return True
 
     def has_test_docs(self):
-        return False
+        return True
 
     def training_docs(self):
         return map(self._process_doc, self.dataset['train'])

@@ -30,6 +30,7 @@ def parse_args():
     parser.add_argument("--check_integrity", action="store_true")
     parser.add_argument("--write_out", action="store_true", default=False)
     parser.add_argument("--output_base_path", type=str, default=None)
+    parser.add_argument("-n","--is_new", default=False, action="store_true")
 
     return parser.parse_args()
 
@@ -88,6 +89,10 @@ def main():
     )
     print(evaluator.make_table(results))
 
-
+    evaluator.save_to_database(results, args.model_args.split("/")[-1] if "pretrained" in args.model_args else results['config']['lm_info'])
+    
+    evaluator.make_csv(args.is_new, results, args.model_args.split("/")[-1] if "pretrained" in args.model_args else results['config']['lm_info'])
+    
+    
 if __name__ == "__main__":
     main()

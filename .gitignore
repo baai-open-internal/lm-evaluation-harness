@@ -1,7 +1,7 @@
-env
 *.pyc
-data/
-lm_cache
-.idea
-
 *.egg-info/
+
+custom_dataset/
+sh/
+database_config.json
+output/
