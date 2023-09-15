@@ -131,6 +131,7 @@ def simple_evaluate(
         "limit": limit,
         "bootstrap_iters": bootstrap_iters,
         "description_dict": description_dict,
+        "lm_info": getattr(lm, 'model_info', 'test_model')
     }
 
     return results
@@ -440,11 +441,6 @@ def make_csv(is_new, result_dict, model_info):
     else:
         df = pd.read_csv(f"output/{model_info}.csv")
     
-    math_idx = []
-    hendrycksTest_idx = []
-    ceval_idx = []
-    cmmlu_idx = []
-    
     if is_new:
         row_idx = len(df)
     else:
@@ -452,70 +448,35 @@ def make_csv(is_new, result_dict, model_info):
     
     num_fewshot = result_dict['config']['num_fewshot']
     
+    need_avg = {'hendrycksTest': [], 'ceval': [], 'cmmlu': [], 'xstory_cloze':[], 'xcopa': [], 'xwinograd':[]}
+    
     for task_name, metric_dic in result_dict['results'].items():
         
-        if task_name.startswith('math'):
-            math_idx.append(task_name)
-        
-        elif task_name.startswith('hendrycksTest'):
-            hendrycksTest_idx.append(task_name)
-        
-        elif task_name.startswith('ceval'):
-            ceval_idx.append(task_name)
-        
-        elif task_name.startswith('cmmlu'):
-            cmmlu_idx.append(task_name)
-        
+        for need_avg_name in need_avg.keys():
+            if task_name.startswith(need_avg_name):
+                need_avg[need_avg_name].append(task_name)
+    
         for metric_name, metric_value in metric_dic.items():
             
             if metric_name.endswith('_stderr') or metric_name == 'num_samples':
                     continue
             
-            df.loc[row_idx, task_name+'_'+ str(num_fewshot) + "shot" + '_' + metric_name] = f"{round(metric_value * 100, 2)}"
-                
-    
-    '''if len(math_idx) > 0:
-        avgacc = 0
-        total_len = 0
-        for task_name in math_idx:
-            num_samples = result_dict['results'][task_name]['num_samples']
-            avgacc += result_dict['results'][task_name].get(metric_type, 0) * num_samples
-            total_len += num_samples
+            df.loc[row_idx, task_name+'_'+ str(num_fewshot) + "shot" + '_' + metric_name] = round_to_int(metric_value) / 100
             
-        avgacc /= total_len
-        df.loc[len(df)-1, 'math'] = f"{round(avgacc*100,2)}"'''
+    for avg_name, dataset_list in need_avg.items():
         
-    if len(hendrycksTest_idx) > 0:
-        for metric_name, metric_value in result_dict['results'][hendrycksTest_idx[0]].items():
-            avg = 0
-            if metric_name.endswith('_stderr') or metric_name == 'num_samples':
-                    continue
-            for task_name in hendrycksTest_idx:
-                avg += result_dict['results'][task_name].get(metric_name, 0)
-            avg /= len(hendrycksTest_idx)
-            df.loc[row_idx, 'hendrycksTest_fullavg_' + str(num_fewshot) + "shot" + '_' + metric_name] = f"{round(avg * 100, 2)}"
-        
-    
-    if len(ceval_idx) > 0:
-        for metric_name, metric_value in result_dict['results'][ceval_idx[0]].items():
-            avg = 0
-            if metric_name.endswith('_stderr') or metric_name == 'num_samples':
-                    continue
-            for task_name in ceval_idx:
-                avg += result_dict['results'][task_name].get(metric_name, 0)
-            avg /= len(ceval_idx)
-            df.loc[row_idx, 'ceval_fullavg_' + str(num_fewshot) + "shot" + '_' + metric_name] = f"{round(avg * 100, 2)}"
-            
-    
-    if len(cmmlu_idx) > 0:
-        for metric_name, metric_value in result_dict['results'][cmmlu_idx[0]].items():
-            avg = 0
-            if metric_name.endswith('_stderr') or metric_name == 'num_samples':
-                    continue
-            for task_name in cmmlu_idx:
-                avg += result_dict['results'][task_name].get(metric_name, 0)
-            avg /= len(cmmlu_idx)
-            df.loc[row_idx, 'cmmlu_fullavg_' + str(num_fewshot) + "shot" + '_' + metric_name] = f"{round(avg * 100, 2)}"
+        if len(dataset_list) > 0:
+            for metric_name, metric_value in result_dict['results'][dataset_list[0]].items():
+                avg = 0
+                if metric_name.endswith('_stderr') or metric_name == 'num_samples':
+                        continue
+                for task_name in dataset_list:
+                    avg += result_dict['results'][task_name].get(metric_name, 0)
+                avg /= len(dataset_list)
+                if avg_name == 'cmmlu' and len(dataset_list) == 5:
+                    df.loc[row_idx, 'cmmlu_fivetasksavg_' + str(num_fewshot) + "shot" + '_' + metric_name] = round_to_int(avg) / 100
+                else:
+                    df.loc[row_idx, f'{avg_name}_fullavg_' + str(num_fewshot) + "shot" + '_' + metric_name] = round_to_int(avg) / 100
             
     df.to_csv(f"output/{model_info}.csv", index=False)
 
@@ -545,83 +506,43 @@ def save_to_database(result_dict, model_info):
 
     cursor = cnx.cursor()
     
-    math_idx = []
-    hendrycksTest_idx = []
-    ceval_idx = []
-    cmmlu_idx = []
+    need_avg = {'hendrycksTest': [], 'ceval': [], 'cmmlu': [], 'xstory_cloze':[], 'xcopa': [], 'xwinograd':[]}
     
     num_fewshot = result_dict['config']['num_fewshot']
     
     for task_name, metric_dic in result_dict['results'].items():
         
-        if task_name.startswith('math'):
-            math_idx.append(task_name)
-        
-        elif task_name.startswith('hendrycksTest'):
-            hendrycksTest_idx.append(task_name)
-        
-        elif task_name.startswith('ceval'):
-            ceval_idx.append(task_name)
-        
-        elif task_name.startswith('cmmlu'):
-            cmmlu_idx.append(task_name)
+        for need_avg_name in need_avg.keys():
+            if task_name.startswith(need_avg_name):
+                need_avg[need_avg_name].append(task_name)
         
         for metric_name, metric_value in metric_dic.items():
             if metric_name.endswith('_stderr') or metric_name == 'num_samples':
                 continue
-            insert_new_record('lm_harness_evaluation', {'model_name': model_info, "dataset_name": task_name+'_'+ str(num_fewshot) + "shot", "metric_name": metric_name, "metric_value": round(metric_value * 10000, 4)}, cursor)
-                
-    
-    '''if len(math_idx) > 0:
-        avgacc = 0
-        total_len = 0
-        for task_name in math_idx:
-            num_samples = result_dict['results'][task_name]['num_samples']
-            avgacc += result_dict['results'][task_name].get(metric_type, 0) * num_samples
-            total_len += num_samples
+            insert_new_record('lm_harness_evaluation', {'model_name': model_info, "dataset_name": task_name+'_'+ str(num_fewshot) + "shot", "metric_name": metric_name, "metric_value": round_to_int(metric_value)}, cursor)
             
-        avgacc /= total_len
-        df.loc[len(df)-1, 'math'] = f"{round(avgacc*100,2)}"'''
-        
-    if len(hendrycksTest_idx) > 0:
-        for metric_name, metric_value in result_dict['results'][hendrycksTest_idx[0]].items():
-            avg = 0
-            if metric_name.endswith('_stderr') or metric_name == 'num_samples':
-                    continue
-            for task_name in hendrycksTest_idx:
-                avg += result_dict['results'][task_name].get(metric_name, 0)
-            avg /= len(hendrycksTest_idx)
-            insert_new_record('lm_harness_evaluation', {'model_name': model_info, "dataset_name": 'hendrycksTest_fullavg_' + str(num_fewshot) + "shot", "metric_name": metric_name, "metric_value": round(avg * 10000, 4)}, cursor)
-        
-    
-    if len(ceval_idx) > 0:
-        for metric_name, metric_value in result_dict['results'][ceval_idx[0]].items():
-            avg = 0
-            if metric_name.endswith('_stderr') or metric_name == 'num_samples':
-                    continue
-            for task_name in ceval_idx:
-                avg += result_dict['results'][task_name].get(metric_name, 0)
-            avg /= len(ceval_idx)
-            insert_new_record('lm_harness_evaluation', {'model_name': model_info, "dataset_name": 'ceval_fullavg_' + str(num_fewshot) + "shot", "metric_name": metric_name, "metric_value": round(avg * 10000, 4)}, cursor)
             
-    
-    if len(cmmlu_idx) > 0:
-        for metric_name, metric_value in result_dict['results'][cmmlu_idx[0]].items():
-            avg = 0
-            if metric_name.endswith('_stderr') or metric_name == 'num_samples':
-                    continue
-            for task_name in cmmlu_idx:
-                avg += result_dict['results'][task_name].get(metric_name, 0)
-            avg /= len(cmmlu_idx)
-            insert_new_record('lm_harness_evaluation', {'model_name': model_info, "dataset_name": 'cmmlu_fivetasksavg_' + str(num_fewshot) + "shot", "metric_name": metric_name, "metric_value": round(avg * 10000, 4)}, cursor)
+    for avg_name, dataset_list in need_avg.items():
         
+        if len(dataset_list) > 0:
+            for metric_name, metric_value in result_dict['results'][dataset_list[0]].items():
+                avg = 0
+                if metric_name.endswith('_stderr') or metric_name == 'num_samples':
+                        continue
+                for task_name in dataset_list:
+                    avg += result_dict['results'][task_name].get(metric_name, 0)
+                avg /= len(dataset_list)
+                if avg_name == 'cmmlu' and len(dataset_list) == 5:
+                    insert_new_record('lm_harness_evaluation', {'model_name': model_info, "dataset_name": 'cmmlu_fivetasksavg_' + str(num_fewshot) + "shot", "metric_name": metric_name, "metric_value": round_to_int(avg)}, cursor)
+                else:
+                    insert_new_record('lm_harness_evaluation', {'model_name': model_info, "dataset_name": f'{avg_name}_fullavg_' + str(num_fewshot) + "shot", "metric_name": metric_name, "metric_value": round_to_int(avg)}, cursor)
             
     cnx.commit()
     
     cursor.close()
     cnx.close()
-
-
+    
+    
 
 def detect_and_add_column(table_name, record, cursor):
     
@@ -695,4 +616,6 @@ def update_old_record(table_name, record, cursor):
     else:
         print("Warning: no record found, insert new record instead.")
 
-        
+
+def round_to_int(metric_value):
+    return int(metric_value * 10000 + 0.5)

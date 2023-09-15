@@ -9,6 +9,7 @@ import requests
 import json
 import math
 from typing import List, Mapping, NewType, Optional, Tuple, Union
+# from flagai.data.tokenizer import Tokenizer
 
 def get_response(prompt,
                  url = "http://127.0.0.1:5050/func", 
@@ -37,7 +38,11 @@ def get_response(prompt,
         }
     for i in range(5):  # 尝试5次
         try:
-            response = requests.post(url, json=json.dumps(raw_request))
+            start_time = time.time()
+            # response = requests.post(url, json=json.dumps(raw_request))
+            response = requests.post(url, json=json.dumps(raw_request), headers={"Authorization":"#e7sYA3M&#9A#^nihtJh9FRpXX_woK0OulJgfAI9sogZL+lQXM0n9VQlzC#4_p&Th&"})
+            elapsed_time = time.time() - start_time
+            if elapsed_time > 1: print(f"Request took {elapsed_time} seconds")
             if response.status_code == 200:
                 response = response.json()
                 return response
@@ -62,6 +67,7 @@ def get_result(response_cc, response_c):
         continuation_logprobs = 0
         
         continuation_tokens = response_c['completions'][k]['tokens'][1:]
+        
         ans_idx = -1
 
         for i in range(len(tokens)-len(continuation_tokens) + 1):
@@ -115,8 +121,14 @@ class AquilaLM(BaseLM):
 
 
         self.url = url
+        #get model info from url
+        response = get_response(
+            url=self.url, 
+            prompt=["你好"],
+        )
+        self.model_info = response["model_info"]
+        
         self.tokenizer = transformers.GPT2TokenizerFast.from_pretrained("gpt2")
-        self.model_info = "aquila"
         self.vocab_size = self.tokenizer.vocab_size
         self._batch_size = int(batch_size)
 
@@ -187,6 +199,12 @@ class AquilaLM(BaseLM):
     #     print(f'unfaithful numbers: , {cnt}/{len(requests)}')
     #     return res
     
+    def need_strip(self,):
+        if 'aquila3tok' in self.model_info:
+            return True
+        elif 'baichuantok' in self.model_info:
+            return True
+        return True
     def loglikelihood(self, requests):
         res = []
         
@@ -196,12 +214,18 @@ class AquilaLM(BaseLM):
                 url=self.url, 
                 prompt=[c[0]+ c[1] for c in chunk],
             )
+            
+            # tokenizer issue: space in first
+            if 'aquila3tok' in self.model_info or 'baichuantok' in self.model_info:
+                prompt = [c[1].strip() for c in chunk]
+            else:
+                prompt = [c[1] for c in chunk]
             response_c = get_response(
                 url=self.url,
-                prompt=[c[1] for c in chunk],
+                prompt=prompt,
             )
+            
             if response_cc is not None and response_c is not None:
-                self.model_info = response_cc["model_info"]
                 answer = get_result(response_cc, response_c)
             else:
                 cnt += 1
