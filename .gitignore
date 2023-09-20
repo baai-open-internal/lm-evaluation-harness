@@ -1,6 +1,5 @@
 *.pyc
 *.egg-info/
-
 custom_dataset/
 sh/
 database_config.json

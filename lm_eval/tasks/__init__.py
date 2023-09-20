@@ -6,6 +6,7 @@ import lm_eval.base
 
 from . import babi
 from . import cmmlu
+from . import ex_cmmlu
 from . import ceval
 from . import superglue
 from . import glue
@@ -348,6 +349,7 @@ TASK_REGISTRY = {
     **scrolls.construct_tasks(),
     **ceval.create_all_tasks(),
     **cmmlu.create_all_tasks(),
+    **ex_cmmlu.create_all_tasks(),
 }
 
 

@@ -448,7 +448,7 @@ def make_csv(is_new, result_dict, model_info):
     
     num_fewshot = result_dict['config']['num_fewshot']
     
-    need_avg = {'hendrycksTest': [], 'ceval': [], 'cmmlu': [], 'xstory_cloze':[], 'xcopa': [], 'xwinograd':[]}
+    need_avg = {'hendrycksTest': [], 'ceval': [], 'cmmlu': [], 'xstory_cloze':[], 'xcopa': [], 'xwinograd':[], 'ex_cmmlu':[]}
     
     for task_name, metric_dic in result_dict['results'].items():
         
@@ -506,7 +506,7 @@ def save_to_database(result_dict, model_info):
 
     cursor = cnx.cursor()
     
-    need_avg = {'hendrycksTest': [], 'ceval': [], 'cmmlu': [], 'xstory_cloze':[], 'xcopa': [], 'xwinograd':[]}
+    need_avg = {'hendrycksTest': [], 'ceval': [], 'cmmlu': [], 'xstory_cloze':[], 'xcopa': [], 'xwinograd':[], 'ex_cmmlu':[]}
     
     num_fewshot = result_dict['config']['num_fewshot']
     
