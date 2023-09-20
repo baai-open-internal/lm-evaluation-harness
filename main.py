@@ -88,10 +88,20 @@ def main():
         f"num_fewshot: {args.num_fewshot}, batch_size: {args.batch_size}{f' ({batch_sizes})' if batch_sizes else ''}"
     )
     print(evaluator.make_table(results))
-
-    evaluator.save_to_database(results, args.model_args.split("/")[-1] if "pretrained" in args.model_args else results['config']['lm_info'])
     
-    evaluator.make_csv(args.is_new, results, args.model_args.split("/")[-1] if "pretrained" in args.model_args else results['config']['lm_info'])
+    model_args_list = args.model_args.split(',')
+    model_name = 'N/A'
+    for model_arg in model_args_list:
+        if 'pretrained' in model_arg:
+            model_name = model_arg.split('/')[-1]
+            break
+    if model_name == 'N/A':
+        model_name = results['config']['lm_info']
+        
+
+    evaluator.save_to_database(results, model_name)
+    
+    evaluator.make_csv(args.is_new, results, model_name)
     
     
 if __name__ == "__main__":
