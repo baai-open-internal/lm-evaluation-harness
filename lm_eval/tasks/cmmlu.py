@@ -102,6 +102,7 @@ class GeneralCmmluTask(MultipleChoiceTask):
 
     def __init__(self, subject):
         data_dir = f'custom_dataset/cmmlu/{subject}'
+        self.DATASET_NAME = subject
         super().__init__(data_dir=data_dir)
 
     def has_training_docs(self):
@@ -121,24 +122,50 @@ class GeneralCmmluTask(MultipleChoiceTask):
 
     def test_docs(self):
         return map(self._process_doc, self.dataset['test'])
-
+    
+    def fewshot_context(self, doc, num_fewshot, **kwargs):
+        subject = self.DATASET_NAME
+        description= f"以下是关于{subject}的单项选择题，请直接给出正确答案的选项。"
+        kwargs["description"] = description
+        return super().fewshot_context(doc=doc, num_fewshot=num_fewshot, **kwargs)
+    
     def _process_doc(self, doc):
-        
+        def format_example(doc, keys):
+            """
+            <prompt>
+            A. <choice1>
+            B. <choice2>
+            C. <choice3>
+            D. <choice4>
+            答案：
+            """
+
+            question = doc["question"].strip()
+            choices = "".join(
+                [f'{key}. {doc[key]}\n' for key in keys]
+            )
+            prompt = f"{question}\n{choices}答案："
+            return prompt
+
         keys = ["A", "B", "C", "D"]
-        choices = []
-        for key in keys:
-            choices.append(doc[key])
-        gold = keys.index(doc["answer"])
-        
-        query = "Question: " + doc["question"] + "\nChoices:\n"
-        query += "".join([f"{key}. {doc[key]}\n" for key in keys])
-        query += "Answer:"
-                
         return {
-            "query": query,  # The query prompt.
-            "choices": choices,  # The list of choices.
-            "gold": gold,  # The integer used to index into the correct element of `"choices"`.
+            "query": format_example(doc, keys),
+            "choices": keys,
+            "gold": ord(doc["answer"])-ord("A"),
         }
 
     def doc_to_text(self, doc):
+        return doc["query"]
+
+    '''def fewshot_examples(self, k, rnd):
+        if self._fewshot_docs is None:
+            self._fewshot_docs = list(map(self._process_doc, self.dataset["train"]))
+
+        # use the unchanged order of the dev set without sampling,
+        return self._fewshot_docs[:k]'''
+
+    def should_decontaminate(self):
+        return True
+
+    def doc_to_decontamination_query(self, doc):
         return doc["query"]

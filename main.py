@@ -30,6 +30,7 @@ def parse_args():
     parser.add_argument("--check_integrity", action="store_true")
     parser.add_argument("--write_out", action="store_true", default=False)
     parser.add_argument("--output_base_path", type=str, default=None)
+    parser.add_argument("--special_model_name", type=str, default=None)
     parser.add_argument("-n","--is_new", default=False, action="store_true")
 
     return parser.parse_args()
@@ -89,14 +90,18 @@ def main():
     )
     print(evaluator.make_table(results))
     
-    model_args_list = args.model_args.split(',')
-    model_name = 'N/A'
-    for model_arg in model_args_list:
-        if 'pretrained' in model_arg:
-            model_name = model_arg.split('/')[-1]
-            break
-    if model_name == 'N/A':
-        model_name = results['config']['lm_info']
+    
+    if args.special_model_name is not None:
+        model_name = args.special_model_name
+    else:
+        model_args_list = args.model_args.split(',')
+        model_name = None
+        for model_arg in model_args_list:
+            if 'pretrained' in model_arg:
+                model_name = model_arg.split('/')[-1]
+                break
+        if model_name == None:
+            model_name = results['config']['lm_info']
         
 
     evaluator.save_to_database(results, model_name)

@@ -120,25 +120,22 @@ class CmmluSubject(MultipleChoiceTask):
         super().__init__(data_dir=data_dir)
 
     def has_training_docs(self):
-        return False
+        return True
 
     def has_validation_docs(self):
         return True
 
     def has_test_docs(self):
         return True
+    
+    def training_docs(self):
+        return map(self._process_doc, self.dataset['validation'])
 
     def validation_docs(self):
-        if self.has_validation_docs():
-            return map(self._process_doc,self.dataset["dev"])
+        return map(self._process_doc,self.dataset["validation"])
 
     def test_docs(self):
-        if self.has_test_docs():
-            return map(self._process_doc,self.dataset["test"])
-
-    def _format_subject(self, subject):
-        words = subject.split("_")
-        return " ".join(words)
+        return map(self._process_doc,self.dataset["test"])
 
     def fewshot_context(self, doc, num_fewshot, **kwargs):
         subject = self.DATASET_NAME
@@ -171,12 +168,12 @@ class CmmluSubject(MultipleChoiceTask):
             "gold": ord(doc["Answer"])-ord("A"),
         }
 
-    def fewshot_examples(self, k, rnd):
+    '''def fewshot_examples(self, k, rnd):
         if self._fewshot_docs is None:
-            self._fewshot_docs = list(map(self._process_doc, self.dataset["dev"]))
+            self._fewshot_docs = list(map(self._process_doc, self.dataset["validation"]))
 
         # use the unchanged order of the dev set without sampling,
-        return self._fewshot_docs[:k]
+        return self._fewshot_docs[:k]'''
 
     def doc_to_text(self, doc):
         return doc["query"]
