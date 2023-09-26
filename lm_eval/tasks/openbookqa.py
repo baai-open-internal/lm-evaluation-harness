@@ -29,8 +29,8 @@ _CITATION = """
 
 class OpenBookQA(MultipleChoiceTask):
     VERSION = 0
-    DATASET_PATH = "openbookqa"
-    DATASET_NAME = "main"
+    DATASET_PATH = 'custom_dataset/openbookqa/main'
+    #DATASET_NAME = "main"
 
     def has_training_docs(self):
         return True

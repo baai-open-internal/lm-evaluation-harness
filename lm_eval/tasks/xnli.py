@@ -216,7 +216,8 @@ class XNLIBase(Task):
 
 
 class XNLI_en(XNLIBase):  # English
-    DATASET_NAME = "en"
+    DATASET_PATH = 'custom_dataset/xnli/en'
+    #DATASET_NAME = "en"
 
     QUESTION_WORD = "right"
     ENTAILMENT_LABEL = "Yes"
@@ -225,7 +226,8 @@ class XNLI_en(XNLIBase):  # English
 
 
 class XNLI_de(XNLIBase):  # German
-    DATASET_NAME = "de"
+    DATASET_PATH = 'custom_dataset/xnli/de'
+    #DATASET_NAME = "de"
 
     QUESTION_WORD = "richtig"
     ENTAILMENT_LABEL = "Ja"
@@ -234,7 +236,8 @@ class XNLI_de(XNLIBase):  # German
 
 
 class XNLI_ar(XNLIBase):  # Arabic
-    DATASET_NAME = "ar"
+    DATASET_PATH = 'custom_dataset/xnli/ar'
+    #DATASET_NAME = "ar"
 
     QUESTION_WORD = "صحيح"
     ENTAILMENT_LABEL = "نعم"
@@ -261,7 +264,8 @@ class XNLI_el(XNLIBase):  # Greek
 
 
 class XNLI_es(XNLIBase):  # Spanish
-    DATASET_NAME = "es"
+    DATASET_PATH = 'custom_dataset/xnli/es'
+    #DATASET_NAME = "es"
 
     QUESTION_WORD = "correcto"
     ENTAILMENT_LABEL = "Sí"
@@ -270,7 +274,8 @@ class XNLI_es(XNLIBase):  # Spanish
 
 
 class XNLI_fr(XNLIBase):  # French
-    DATASET_NAME = "fr"
+    DATASET_PATH = 'custom_dataset/xnli/fr'
+    #DATASET_NAME = "fr"
 
     QUESTION_WORD = "correct"
     ENTAILMENT_LABEL = "Oui"
@@ -288,7 +293,8 @@ class XNLI_hi(XNLIBase):  # Hindi
 
 
 class XNLI_ru(XNLIBase):  # Russian
-    DATASET_NAME = "ru"
+    DATASET_PATH = 'custom_dataset/xnli/ru'
+    #DATASET_NAME = "ru"
 
     QUESTION_WORD = "правильно"
     ENTAILMENT_LABEL = "Да"
@@ -306,7 +312,8 @@ class XNLI_sw(XNLIBase):  # Swahili
 
 
 class XNLI_th(XNLIBase):  # Thai
-    DATASET_NAME = "th"
+    DATASET_PATH = 'custom_dataset/xnli/th'
+    #DATASET_NAME = "th"
 
     QUESTION_WORD = "ถูกต้อง"
     ENTAILMENT_LABEL = "ใช่"
@@ -342,7 +349,8 @@ class XNLI_vi(XNLIBase):  # Vietnamese
 
 
 class XNLI_zh(XNLIBase):  # Chinese
-    DATASET_NAME = "zh"
+    DATASET_PATH = 'custom_dataset/xnli/zh'
+    #DATASET_NAME = "zh"
 
     QUESTION_WORD = "正确"
     ENTAILMENT_LABEL = "是的"

@@ -28,7 +28,7 @@ _CITATION = """
 
 class PiQA(MultipleChoiceTask):
     VERSION = 0
-    DATASET_PATH = "piqa"
+    DATASET_PATH = 'custom_dataset/piqa'
     DATASET_NAME = None
 
     def has_training_docs(self):

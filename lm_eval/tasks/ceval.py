@@ -98,13 +98,14 @@ def create_task(subject):
 
 class GeneralCevalTask(MultipleChoiceTask):
     VERSION = 0
-    DATASET_PATH = 'csv'
+    DATASET_PATH = 'custom_dataset/ceval'
     DATASET_NAME = None
+    SUBJECT = None
 
     def __init__(self, subject):
-        data_dir = f'custom_dataset/ceval/{subject}'
-        self.DATASET_NAME = subject
-        super().__init__(data_dir=data_dir)
+        self.DATASET_PATH = f'custom_dataset/ceval/{subject}'
+        self.SUBJECT = subject
+        super().__init__()
 
     def has_training_docs(self):
         return True
@@ -125,10 +126,37 @@ class GeneralCevalTask(MultipleChoiceTask):
         return map(self._process_doc, self.dataset['test'])
     
     def fewshot_context(self, doc, num_fewshot, **kwargs):
-        subject = self.DATASET_NAME
+        subject = self.SUBJECT
         description= f"以下是关于{subject}的单项选择题，请直接给出正确答案的选项。"
         kwargs["description"] = description
         return super().fewshot_context(doc=doc, num_fewshot=num_fewshot, **kwargs)
+    
+    '''def _process_doc(self, doc):
+        def format_example(doc, keys):
+            """
+            <prompt>
+            A. <choice1>
+            B. <choice2>
+            C. <choice3>
+            D. <choice4>
+            答案：
+            """
+
+            question = doc["question"].strip()
+            choices = "".join(
+                [f'{key}. {doc[key]}\n' for key in keys]
+            )
+            prompt = f"{question}\n{choices}答案："
+            return prompt
+
+        keys = ["A", "B", "C", "D"]
+        keys_content = [doc[key] for key in keys]
+        return {
+            "query": format_example(doc, keys),
+            "choices": keys_content,
+            "gold": ord(doc["answer"])-ord("A"),
+        }'''
+
     
     def _process_doc(self, doc):
         def format_example(doc, keys):

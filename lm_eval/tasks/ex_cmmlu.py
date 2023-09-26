@@ -111,13 +111,14 @@ def create_task(subject):
 class CmmluSubject(MultipleChoiceTask):
     
     VERSION = 1
-    DATASET_PATH = 'csv'
+    DATASET_PATH = 'custom_dataset/haonan-li___cmmlu'
     DATASET_NAME = None
+    SUBJECT = None
 
     def __init__(self, subject):
-        data_dir = f'custom_dataset/ex_cmmlu/{subject}'
-        self.DATASET_NAME = subject
-        super().__init__(data_dir=data_dir)
+        self.DATASET_PATH = f"custom_dataset/haonan-li___cmmlu/{subject}"
+        self.SUBJECT = subject
+        super().__init__()
 
     def has_training_docs(self):
         return True
@@ -138,7 +139,7 @@ class CmmluSubject(MultipleChoiceTask):
         return map(self._process_doc,self.dataset["test"])
 
     def fewshot_context(self, doc, num_fewshot, **kwargs):
-        subject = self.DATASET_NAME
+        subject = self.SUBJECT
         description= f"以下是关于{SUBJECTS[subject]}的单项选择题，请直接给出正确答案的选项。"
         kwargs["description"] = description
         return super().fewshot_context(doc=doc, num_fewshot=num_fewshot, **kwargs)

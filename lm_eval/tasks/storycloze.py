@@ -38,13 +38,13 @@ class StoryCloze(Task):
     DATASET_PATH = "story_cloze"
     DATASET_NAME = None
 
-    def __init__(self, data_dir: str):
+    def __init__(self):
         """
         StoryCloze is not publicly available. You must download the data by
         following https://cs.rochester.edu/nlp/rocstories/ and pass the folder
         path into the `data_dir` arg.
         """
-        super().__init__(data_dir=data_dir)
+        super().__init__()
 
     def has_training_docs(self):
         return False

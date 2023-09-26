@@ -31,8 +31,8 @@ _CITATION = """
 
 class Winogrande(Task):
     VERSION = 0
-    DATASET_PATH = "winogrande"
-    DATASET_NAME = "winogrande_xl"
+    DATASET_PATH = "custom_dataset/winogrande/winogrande_xl"
+    #DATASET_NAME = "winogrande_xl"
 
     answer_to_num = {"1": 0, "2": 1}
 

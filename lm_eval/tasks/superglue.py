@@ -34,8 +34,8 @@ _CITATION = """
 
 class BoolQ(Task):
     VERSION = 1
-    DATASET_PATH = "super_glue"
-    DATASET_NAME = "boolq"
+    DATASET_PATH = 'custom_dataset/super_glue/boolq'
+    #DATASET_NAME = "boolq"
 
     def has_training_docs(self):
         return True

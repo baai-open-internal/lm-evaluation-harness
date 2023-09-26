@@ -56,11 +56,10 @@ def create_all_tasks():
 
 def create_task(lang):
     class XStoryCloze(StoryCloze):
-        DATASET_PATH = "juletxara/xstory_cloze"
-        DATASET_NAME = lang
+        DATASET_PATH = f'custom_dataset/juletxara___xstory_cloze/{lang}-data_dir=.'
 
         def __init__(self):
-            super().__init__(data_dir="")
+            super().__init__()
 
         def has_training_docs(self):
             return True
@@ -75,7 +74,7 @@ def create_task(lang):
             return self.dataset["train"]
 
         def validation_docs(self):
-            return self.dataset["eval"]
+            return self.dataset["test"]
 
         def test_docs(self):
             pass

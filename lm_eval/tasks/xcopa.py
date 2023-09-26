@@ -25,7 +25,7 @@ _CITATION = """
 
 class XCopa(Copa):
     VERSION = 0
-    DATASET_PATH = "xcopa"
+    DATASET_PATH = 'custom_dataset/xcopa'
     DATASET_NAME = None
     CAUSE = "because"
     EFFECT = "therefore"
@@ -67,7 +67,8 @@ class XCopaHt(XCopa):
 
 
 class XCopaIt(XCopa):
-    DATASET_NAME = "it"
+    DATASET_PATH = 'custom_dataset/xcopa/it'
+    #DATASET_NAME = "it"
     CAUSE = "perché"
     EFFECT = "quindi"
 
@@ -91,7 +92,8 @@ class XCopaSw(XCopa):
 
 
 class XCopaZh(XCopa):
-    DATASET_NAME = "zh"
+    DATASET_PATH = 'custom_dataset/xcopa/zh'
+    #DATASET_NAME = "zh"
     CAUSE = "因为"
     EFFECT = "所以"
 
@@ -103,7 +105,8 @@ class XCopaTa(XCopa):
 
 
 class XCopaTh(XCopa):
-    DATASET_NAME = "th"
+    DATASET_PATH = 'custom_dataset/xcopa/th'
+    #DATASET_NAME = "th"
     CAUSE = "เพราะ"
     EFFECT = "ดังนั้น"
 

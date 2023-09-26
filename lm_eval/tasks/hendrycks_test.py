@@ -103,11 +103,13 @@ def create_task(subject):
 
 class GeneralHendrycksTest(MultipleChoiceTask):
     VERSION = 1
-    DATASET_PATH = "cais/mmlu"
+    DATASET_PATH = 'custom_dataset/cais___mmlu'
     DATASET_NAME = None
+    SUBJECT = None
 
     def __init__(self, subject):
-        self.DATASET_NAME = subject
+        self.DATASET_PATH = f'custom_dataset/cais___mmlu/{subject}'
+        self.SUBJECT = subject
         super().__init__()
 
     def has_training_docs(self):
@@ -130,7 +132,7 @@ class GeneralHendrycksTest(MultipleChoiceTask):
         return " ".join(words)
 
     def fewshot_context(self, doc, num_fewshot, **kwargs):
-        subject = self.DATASET_NAME
+        subject = self.SUBJECT
         description = f"The following are multiple choice questions (with answers) about {self._format_subject(subject)}."
         kwargs["description"] = description
         return super().fewshot_context(doc=doc, num_fewshot=num_fewshot, **kwargs)
@@ -164,7 +166,7 @@ class GeneralHendrycksTest(MultipleChoiceTask):
         # fewshot_examples is not just sampling from train_docs because dev is
         # in the same distribution as val/test but auxiliary_train isn't
         if self._fewshot_docs is None:
-            self._fewshot_docs = list(map(self._process_doc, self.dataset["dev"]))
+            self._fewshot_docs = list(map(self._process_doc, self.dataset["validation"]))
 
         # use the unchanged order of the dev set without sampling,
         # just as in the original code https://github.com/hendrycks/test/blob/master/evaluate.py#L28

@@ -40,8 +40,8 @@ def create_all_tasks():
 
 def create_task(lang):
     class XWinograd(Winogrande):
-        DATASET_PATH = "Muennighoff/xwinograd"
-        DATASET_NAME = lang
+        DATASET_PATH = f"custom_dataset/Muennighoff___xwinograd/{lang}"
+        #DATASET_NAME = lang
 
         def __init__(self):
             super().__init__()
