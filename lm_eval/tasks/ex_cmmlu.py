@@ -36,7 +36,7 @@ SUBJECTS = {
     "chinese_literature": "中国文学",
     "chinese_teacher_qualification": "中国教师资格",
     "clinical_knowledge": "临床知识",
-    #"college_actuarial_science":"大学精算学",
+    "college_actuarial_science":"大学精算学",
     "college_education":"大学教育学",
     "college_engineering_hydrology": "大学工程水文学",
     "college_law": "大学法律",
