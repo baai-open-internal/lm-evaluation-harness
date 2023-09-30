@@ -32,7 +32,7 @@ _CITATION = """
 
 class ANLIBase(Task):
     VERSION = 0
-    DATASET_PATH = "anli"
+    DATASET_PATH = 'custom_dataset/anli'
     DATASET_NAME = None
     SPLIT = None
 
@@ -48,16 +48,16 @@ class ANLIBase(Task):
     def training_docs(self):
         if self.has_training_docs():
             if self._training_docs is None:
-                self._training_docs = list(self.dataset["train_r" + str(self.SPLIT)])
+                self._training_docs = list(self.dataset["train"])
             return self._training_docs
 
     def validation_docs(self):
         if self.has_validation_docs():
-            return self.dataset["dev_r" + str(self.SPLIT)]
+            return self.dataset["validation"]
 
     def test_docs(self):
         if self.has_test_docs():
-            return self.dataset["test_r" + str(self.SPLIT)]
+            return self.dataset["test"]
 
     def doc_to_text(self, doc):
         # OA does this a bit weirdly: they prepend "anli 1:  anli 1:  " to the beginning
@@ -130,7 +130,7 @@ class ANLIBase(Task):
         return {"acc": True}
 
 
-class ANLIRound1(ANLIBase):
+'''class ANLIRound1(ANLIBase):
     SPLIT = 1
 
 
@@ -139,4 +139,4 @@ class ANLIRound2(ANLIBase):
 
 
 class ANLIRound3(ANLIBase):
-    SPLIT = 3
+    SPLIT = 3'''
