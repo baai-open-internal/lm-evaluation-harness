@@ -29,8 +29,8 @@ _CITATION = """
 
 class TriviaQA(Task):
     VERSION = 3
-    DATASET_PATH = "trivia_qa"
-    DATASET_NAME = "rc.nocontext"
+    DATASET_PATH = 'custom_dataset/trivia_qa'
+    #DATASET_NAME = "rc.nocontext"
 
     def has_training_docs(self):
         return True
