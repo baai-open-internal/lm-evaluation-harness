@@ -7,6 +7,7 @@ import lm_eval.base
 from . import babi
 from . import cmmlu
 from . import ex_cmmlu
+from . import c_sem_v2
 from . import ceval
 from . import superglue
 from . import glue
@@ -150,7 +151,8 @@ TASK_REGISTRY = {
     "swag": swag.SWAG,
     "openbookqa": openbookqa.OpenBookQA,
     "squad2": squad.SQuAD2,
-    "race": race.RACE,
+    "race_middle": race.RACEMIDDLE,
+    "race_high": race.RACEHIGH,
     # "naturalqs": naturalqs.NaturalQs, # not implemented yet
     "headqa": headqa.HeadQAEsDeprecated,  # for backwards compat - headqa used to default to es
     "headqa_es": headqa.HeadQAEs,
@@ -351,6 +353,7 @@ TASK_REGISTRY = {
     **ceval.create_all_tasks(),
     **cmmlu.create_all_tasks(),
     **ex_cmmlu.create_all_tasks(),
+    **c_sem_v2.create_all_tasks(),
 }
 
 

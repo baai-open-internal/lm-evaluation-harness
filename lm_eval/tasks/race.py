@@ -34,10 +34,10 @@ class each:
         return list(map(self.f, other))
 
 
-class RACE(Task):
+class RACEMIDDLE(Task):
     VERSION = 1
-    DATASET_PATH = "race"
-    DATASET_NAME = "high"
+    DATASET_PATH = "custom_dataset/race/middle-8e0df1660e6d527e"
+    #DATASET_NAME = "high"
 
     cache = {}
     letter_to_num = {"A": 0, "B": 1, "C": 2, "D": 3}
@@ -171,3 +171,8 @@ class RACE(Task):
             whether a higher value of the submetric is better
         """
         return {"acc": True}
+
+
+class RACEHIGH(RACEMIDDLE):
+    
+    DATASET_PATH = "custom_dataset/race/high"

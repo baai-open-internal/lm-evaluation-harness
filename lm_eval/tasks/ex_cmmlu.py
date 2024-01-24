@@ -163,6 +163,11 @@ class CmmluSubject(MultipleChoiceTask):
             return prompt
 
         keys = ["A", "B", "C", "D"]
+        '''return {
+            "query": format_example(doc, keys),
+            "choices": [doc[key] for key in keys],
+            "gold": ord(doc["Answer"])-ord("A"),
+        }'''
         return {
             "query": format_example(doc, keys),
             "choices": keys,

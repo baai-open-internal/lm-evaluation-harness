@@ -37,8 +37,8 @@ _CITATION = """
 
 class WinogradSchemaChallenge273(Task):
     VERSION = 0
-    DATASET_PATH = "winograd_wsc"
-    DATASET_NAME = "wsc273"
+    DATASET_PATH = "custom_dataset/winograd_wsc/wsc273"
+    #DATASET_NAME = "wsc273"
 
     upper_pronouns = [
         "A",

@@ -156,6 +156,11 @@ class GeneralHendrycksTest(MultipleChoiceTask):
             return prompt
 
         keys = ["A", "B", "C", "D"]
+        '''return {
+            "query": format_example(doc, keys),
+            "choices": doc["choices"],
+            "gold": doc["answer"],
+        }'''
         return {
             "query": format_example(doc, keys),
             "choices": keys,

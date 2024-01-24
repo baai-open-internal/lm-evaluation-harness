@@ -92,7 +92,7 @@ def main():
     
     
     if args.special_model_name is not None:
-        model_name = args.special_model_name
+        model_name = args.special_model_name.split('/')[-1]
     else:
         model_args_list = args.model_args.split(',')
         model_name = None
