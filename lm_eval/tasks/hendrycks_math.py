@@ -25,7 +25,7 @@ _CITATION = """
 
 
 class Math(Task):
-    DATASET_PATH = inspect.getfile(lm_eval.datasets.hendrycks_math.hendrycks_math)
+    DATASET_PATH = 'custom_dataset/hendrycks_math'
     DATASET_NAME = None
 
     def has_training_docs(self):
@@ -283,34 +283,41 @@ class Math(Task):
 
 class MathAlgebra(Math):
     VERSION = 1
-    DATASET_NAME = "algebra"
+    DATASET_PATH = 'custom_dataset/hendrycks_math/algebra'
+    # DATASET_NAME = "algebra"
 
 
 class MathCountingAndProbability(Math):
     VERSION = 1
-    DATASET_NAME = "counting_and_probability"
+    DATASET_PATH = 'custom_dataset/hendrycks_math/counting_and_probability'
+    #DATASET_NAME = "counting_and_probability"
 
 
 class MathGeometry(Math):
     VERSION = 1
-    DATASET_NAME = "geometry"
+    DATASET_PATH = 'custom_dataset/hendrycks_math/geometry'
+    #DATASET_NAME = "geometry"
 
 
 class MathIntermediateAlgebra(Math):
     VERSION = 1
-    DATASET_NAME = "intermediate_algebra"
+    DATASET_PATH = 'custom_dataset/hendrycks_math/intermediate_algebra'
+    #DATASET_NAME = "intermediate_algebra"
 
 
 class MathNumberTheory(Math):
     VERSION = 1
-    DATASET_NAME = "number_theory"
+    DATASET_PATH = 'custom_dataset/hendrycks_math/number_theory'
+    #DATASET_NAME = "number_theory"
 
 
 class MathPrealgebra(Math):
     VERSION = 1
-    DATASET_NAME = "prealgebra"
+    DATASET_PATH = 'custom_dataset/hendrycks_math/prealgebra'
+    #DATASET_NAME = "prealgebra"
 
 
 class MathPrecalculus(Math):
     VERSION = 1
-    DATASET_NAME = "precalculus"
+    DATASET_PATH = 'custom_dataset/hendrycks_math/precalculus'
+    #DATASET_NAME = "precalculus"

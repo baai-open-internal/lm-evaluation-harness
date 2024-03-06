@@ -8,6 +8,11 @@ from . import babi
 from . import cmmlu
 from . import ex_cmmlu
 from . import c_sem_v2
+from . import c_arc
+from . import c_gsm8k
+from . import c_truthfulqa
+from . import c_hellaswag
+from . import c_winogrande
 from . import ceval
 from . import superglue
 from . import glue
@@ -145,9 +150,11 @@ TASK_REGISTRY = {
     "triviaqa": triviaqa.TriviaQA,
     "arc_easy": arc.ARCEasy,
     "arc_challenge": arc.ARCChallenge,
+    "c_arc_challenge": c_arc.C_ARCChallenge,
     # "quac": quac.QuAC, # not implemented yet
     "logiqa": logiqa.LogiQA,
     "hellaswag": hellaswag.HellaSwag,
+    "c_hellaswag": c_hellaswag.C_HellaSwag,
     "swag": swag.SWAG,
     "openbookqa": openbookqa.OpenBookQA,
     "squad2": squad.SQuAD2,
@@ -161,6 +168,7 @@ TASK_REGISTRY = {
     "webqs": webqs.WebQs,
     "wsc273": wsc273.WinogradSchemaChallenge273,
     "winogrande": winogrande.Winogrande,
+    "c_winogrande": c_winogrande.C_Winogrande,
     "anli": anli.ANLIBase,
     #"anli_r1": anli.ANLIRound1,
     #"anli_r2": anli.ANLIRound2,
@@ -173,6 +181,7 @@ TASK_REGISTRY = {
     "ethics_virtue": hendrycks_ethics.EthicsVirtue,
     "truthfulqa_mc": truthfulqa.TruthfulQAMultipleChoice,
     "truthfulqa_gen": truthfulqa.TruthfulQAGeneration,
+    "c_truthfulqa_mc": c_truthfulqa.C_TruthfulQAMultipleChoice,
     # dialogue
     "mutual": mutual.MuTual,
     "mutual_plus": mutual.MuTualPlus,
@@ -183,9 +192,10 @@ TASK_REGISTRY = {
     "math_intermediate_algebra": hendrycks_math.MathIntermediateAlgebra,
     "math_num_theory": hendrycks_math.MathNumberTheory,
     "math_prealgebra": hendrycks_math.MathPrealgebra,
-    "math_precalc": hendrycks_math.MathPrecalculus,
+    "math_precalculus": hendrycks_math.MathPrecalculus,
     "math_asdiv": asdiv.Asdiv,
     "gsm8k": gsm8k.GradeSchoolMath8K,
+    "c_gsm8k": c_gsm8k.C_GradeSchoolMath8K,
     # arithmetic
     "arithmetic_2da": arithmetic.Arithmetic2DPlus,
     "arithmetic_2ds": arithmetic.Arithmetic2DMinus,

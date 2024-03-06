@@ -4,3 +4,4 @@ custom_dataset/
 sh/
 database_config.json
 output/
+log/
